@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weight Loss Exercise Tracker</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="app-header">
+            <h1>Weight Loss Exercise Tracker</h1>
+            <div class="header-info">
+                <div class="current-date" id="currentDate"></div>
+                <div class="week-selector">
+                    <label for="weekSelect" class="form-label">Program Week:</label>
+                    <select id="weekSelect" class="form-control">
+                        <option value="week1-2">Week 1-2 (Beginner)</option>
+                        <option value="week3-4">Week 3-4 (Intermediate)</option>
+                    </select>
+                </div>
+            </div>
+        </header>
+
+        <!-- Daily Progress Overview -->
+        <section class="progress-overview">
+            <div class="card">
+                <div class="card__body">
+                    <h2 id="currentWeekTitle">Beginner Level (Week 1-2)</h2>
+                    <div class="progress-stats">
+                        <div class="progress-item">
+                            <div class="progress-label">Daily Progress</div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="dailyProgress"></div>
+                            </div>
+                            <div class="progress-text" id="progressText">0 of 0 completed</div>
+                        </div>
+                        <div class="motivational-message" id="motivationalMessage">
+                            Ready to start your fitness journey!
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Exercise Lists -->
+        <section class="exercise-section">
+            <!-- Cardio Exercises -->
+            <div class="card exercise-category cardio-category">
+                <div class="card__header">
+                    <h3>
+                        <span class="category-icon">💓</span>
+                        <span id="cardioTitle">Cardio Exercises</span>
+                    </h3>
+                    <div class="category-progress" id="cardioProgress">0/0</div>
+                </div>
+                <div class="card__body">
+                    <div class="exercise-list" id="cardioExercises">
+                        <!-- Cardio exercises will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Strength Exercises -->
+            <div class="card exercise-category strength-category">
+                <div class="card__header">
+                    <h3>
+                        <span class="category-icon">💪</span>
+                        <span id="strengthTitle">Strength Exercises</span>
+                    </h3>
+                    <div class="category-progress" id="strengthProgress">0/0</div>
+                </div>
+                <div class="card__body">
+                    <div class="exercise-list" id="strengthExercises">
+                        <!-- Strength exercises will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Action Buttons -->
+        <section class="action-buttons">
+            <div class="button-group">
+                <button id="completeAllButton" class="btn btn--primary btn--lg">
+                    ✨ Mark All Complete (Demo)
+                </button>
+                <button id="resetButton" class="btn btn--secondary btn--lg">
+                    🔄 Reset Today's Progress
+                </button>
+            </div>
+        </section>
+
+        <!-- Completion Modal -->
+        <div id="completionModal" class="modal hidden">
+            <div class="modal-overlay">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <div class="completion-celebration">
+                            <div class="celebration-icon">🎉</div>
+                            <h3>Congratulations!</h3>
+                            <p id="completionMessage">You've completed all your exercises for today!</p>
+                            <button id="closeModalButton" class="btn btn--primary">
+                                Amazing! Keep Going!
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
