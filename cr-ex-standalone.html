@@ -1,0 +1,2121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CR-Ex — Cardiopulmonary Rehab Companion</title>
+  <style>
+:root {
+  --bg: #f4f6fa;
+  --surface: #ffffff;
+  --surface-2: #f8fafc;
+  --border: #dde3ec;
+  --text: #1a2332;
+  --muted: #5b6678;
+  --accent: #1f6feb;
+  --accent-hover: #1858c4;
+  --accent-soft: #e7f0fe;
+  --success: #15803d;
+  --warn: #c2410c;
+  --warn-soft: #fef3e8;
+  --danger: #b91c1c;
+  --danger-soft: #fee2e2;
+  --radius: 10px;
+  --shadow: 0 1px 2px rgba(15,23,42,.04), 0 4px 12px rgba(15,23,42,.04);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f1115;
+    --surface: #181b22;
+    --surface-2: #20242d;
+    --border: #2a2f3a;
+    --text: #e6e8ee;
+    --muted: #8a92a4;
+    --accent: #4f8cff;
+    --accent-hover: #3a78ee;
+    --accent-soft: rgba(79,140,255,.12);
+    --success: #4ade80;
+    --warn: #fb923c;
+    --warn-soft: rgba(251,146,60,.10);
+    --danger: #f87171;
+    --danger-soft: rgba(248,113,113,.10);
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 12px rgba(0,0,0,.2);
+  }
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.app-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 16px;
+  position: sticky;
+  top: 0;
+  z-index: 5;
+}
+
+.brand { display: flex; align-items: baseline; gap: 12px; }
+.brand h1 { margin: 0; font-size: 1.4rem; letter-spacing: .3px; }
+.brand-sub { color: var(--muted); font-size: .85rem; }
+
+.tabs {
+  display: flex;
+  gap: 4px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+.tab {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: .9rem;
+  font-weight: 500;
+  transition: background .15s ease, color .15s ease, border-color .15s ease;
+}
+.tab:hover { color: var(--text); }
+.tab.active {
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.container {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.view {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  box-shadow: var(--shadow);
+}
+
+.card h2 { margin: 0 0 12px; font-size: 1.05rem; }
+.card h3 { margin: 16px 0 8px; font-size: .95rem; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+
+.subcard {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px dashed var(--border);
+}
+
+.empty {
+  color: var(--muted);
+  font-size: .9rem;
+  text-align: center;
+  padding: 12px 0;
+}
+
+.info {
+  background: var(--accent-soft);
+  border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent);
+  color: var(--text);
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: .9rem;
+  margin-bottom: 12px;
+}
+
+/* Forms */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px 12px;
+}
+.field { display: flex; flex-direction: column; gap: 4px; }
+.field.full { grid-column: 1 / -1; }
+.field label { font-size: .8rem; color: var(--muted); }
+.form-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+  flex-wrap: wrap;
+}
+
+input, select {
+  background: var(--surface-2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: .95rem;
+  outline: none;
+  font-family: inherit;
+  transition: border-color .15s ease;
+}
+input:focus, select:focus { border-color: var(--accent); }
+
+/* Buttons */
+.btn {
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text);
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: .9rem;
+  font-weight: 500;
+  transition: background .15s ease, border-color .15s ease, color .15s ease;
+}
+.btn:hover { border-color: var(--accent); }
+.btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.btn-primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+.btn-ghost { background: transparent; color: var(--muted); }
+.btn-ghost:hover { color: var(--text); }
+.btn-warn { background: var(--warn); border-color: var(--warn); color: #fff; }
+.btn-warn:hover { filter: brightness(0.95); }
+.btn-sm { padding: 5px 10px; font-size: .82rem; }
+.btn-lg { padding: 12px 24px; font-size: 1rem; }
+
+/* Patients */
+.patient-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px; }
+.patient-item {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 14px;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+.patient-main { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
+.patient-name { font-weight: 600; }
+.patient-meta { font-size: .82rem; color: var(--muted); }
+.patient-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+
+/* Patient picker */
+.patient-picker { display: flex; align-items: center; }
+.patient-picker label { display: flex; align-items: center; gap: 8px; flex: 1; }
+.patient-picker select { flex: 1; }
+
+/* Sessions list */
+.session-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 6px; }
+.session-row {
+  display: flex; justify-content: space-between; gap: 10px; align-items: center;
+  background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px;
+  padding: 10px 12px;
+}
+.session-row.done { opacity: 0.65; }
+.session-row-title { font-weight: 500; }
+.session-row-meta { font-size: .8rem; color: var(--muted); }
+
+/* Checklist */
+.exercise-checklist { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 6px; }
+.checklist-item {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 12px;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.checklist-item.done { background: color-mix(in srgb, var(--success) 8%, var(--surface-2)); }
+.checklist-item label { display: flex; gap: 10px; align-items: flex-start; cursor: pointer; }
+.checklist-item input[type="checkbox"] { margin-top: 4px; transform: scale(1.2); }
+.checklist-text { flex: 1; }
+.item-note { font-size: .85rem; }
+
+/* History */
+.history { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px; }
+.history-item {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 14px;
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+.history-main { flex: 1; min-width: 0; }
+.history-title { font-weight: 500; }
+.history-meta { font-size: .82rem; color: var(--muted); }
+
+/* 6MWT timer */
+.timer {
+  font-size: 4rem;
+  font-weight: 600;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  font-family: ui-monospace, "SF Mono", Consolas, monospace;
+  margin: 12px 0 8px;
+  color: var(--accent);
+}
+.progress-bar {
+  height: 8px;
+  background: var(--surface-2);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+.progress-fill {
+  height: 100%;
+  background: var(--accent);
+  transition: width .3s ease;
+}
+
+.cue {
+  text-align: center;
+  font-size: 1.05rem;
+  font-style: italic;
+  padding: 10px 12px;
+  background: var(--accent-soft);
+  border-radius: 8px;
+  margin-bottom: 12px;
+  min-height: 1.5em;
+}
+.cue.muted {
+  background: transparent;
+  color: var(--muted);
+  font-style: normal;
+}
+
+.test-controls {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.lap-block, .spo2-block, .stop-block {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px;
+  text-align: center;
+}
+.lap-label { font-size: .75rem; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 4px; }
+.lap-count { font-size: 2rem; font-weight: 600; font-variant-numeric: tabular-nums; line-height: 1; }
+.lap-buttons { display: flex; gap: 6px; justify-content: center; margin-top: 6px; }
+.spo2-block input { width: 100%; margin: 4px 0; text-align: center; }
+
+/* Script blocks */
+.script {
+  font-style: italic;
+  background: var(--surface-2);
+  border-left: 3px solid var(--accent);
+  padding: 10px 12px;
+  margin: 8px 0;
+  border-radius: 4px;
+  font-size: .92rem;
+}
+
+/* Details / collapsibles */
+details {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin: 12px 0;
+}
+details summary {
+  cursor: pointer;
+  font-weight: 500;
+  font-size: .9rem;
+}
+details[open] summary { margin-bottom: 8px; }
+details ul { margin: 4px 0; padding-left: 20px; }
+details li { font-size: .88rem; margin: 2px 0; }
+
+.stop-criteria { border-color: var(--warn); background: var(--warn-soft); }
+.stop-criteria summary { color: var(--warn); }
+.redflags { border-color: var(--danger); background: var(--danger-soft); }
+.redflags summary { color: var(--danger); }
+
+/* Tables */
+.mini-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .85rem;
+  margin: 8px 0;
+}
+.mini-table th, .mini-table td {
+  border: 1px solid var(--border);
+  padding: 5px 8px;
+  text-align: left;
+}
+.mini-table th {
+  background: var(--surface-2);
+  font-weight: 600;
+}
+
+/* Reference cards */
+.ref { gap: 12px; }
+.ref-card { padding: 16px 20px; }
+.ref-card ul { margin: 4px 0; padding-left: 22px; }
+.ref-card li { margin: 2px 0; font-size: .9rem; }
+.ref-card p { margin: 6px 0; font-size: .9rem; }
+
+.muted { color: var(--muted); font-size: .85rem; }
+
+/* Footer */
+.app-footer {
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+  padding: 10px 16px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: center;
+  font-size: .8rem;
+  color: var(--muted);
+  flex-wrap: wrap;
+}
+
+@media (max-width: 600px) {
+  .timer { font-size: 3rem; }
+  .form-grid { grid-template-columns: 1fr 1fr; }
+  .field.full { grid-column: 1 / -1; }
+}
+
+</style>
+</head>
+<body>
+  <header class="app-header">
+    <div class="brand">
+      <h1>CR-Ex</h1>
+      <span class="brand-sub">Cardiopulmonary Rehab Companion</span>
+    </div>
+    <nav class="tabs" role="tablist">
+      <button class="tab active" data-view="patients">Patients</button>
+      <button class="tab" data-view="sixmwt">6MWT</button>
+      <button class="tab" data-view="sessions">Sessions</button>
+      <button class="tab" data-view="reference">Reference</button>
+    </nav>
+  </header>
+
+  <main id="app" class="container">
+    <!-- views are rendered here -->
+  </main>
+
+  <footer class="app-footer">
+    <span>For clinician use as an aide-mémoire. Always exercise clinical judgement. Not a medical device.</span>
+    <button id="export-btn" class="btn btn-ghost btn-sm" type="button">Export data</button>
+    <button id="import-btn" class="btn btn-ghost btn-sm" type="button">Import</button>
+    <input id="import-file" type="file" accept="application/json" hidden />
+  </footer>
+
+  <script>
+// CR-Ex program library
+// Session-by-session physio programs distilled from docs/conditions.md
+// Sources: GOLD 2025, GINA 2025, ATS 2023 PR CPG, AACVPR 6th ed, ESC 2021/2023, ATS 2002/ERS-ATS 2014.
+
+window.CREX_PROGRAMS = {
+  copd: {
+    label: "COPD",
+    summary: "8-week pulmonary rehab, 2x/week, 16 sessions. Endurance + resistance + breathing + airway clearance.",
+    redFlags: [
+      "SpO2 <88% on prescribed O2 at rest",
+      "HR rest >120 bpm",
+      "SBP >180 or <90; DBP >100",
+      "Fever; acute change in sputum (volume / purulence)",
+      "Unstable angina; new arrhythmia"
+    ],
+    stopRules: [
+      "SpO2 <85% despite O2 titration",
+      "Borg dyspnea ≥8 not relieved by 2-min rest + PLB",
+      "HR drop >10 bpm with rising workload",
+      "SBP rise >250, fall >10 with ischemic features; DBP >115",
+      "New chest pain, cyanosis, lightheadedness, ataxia",
+      "New arrhythmia or wheeze unresponsive to bronchodilator"
+    ],
+    targets: {
+      borgDyspnea: "4-6/10",
+      spo2Floor: "≥88-90% during exercise (titrate O2)",
+      mcid6mwd: "25-35 m"
+    },
+    sessions: [
+      { n: 1, title: "Assessment & Education",
+        items: [
+          "6MWT #1 (baseline)",
+          "1-min sit-to-stand baseline",
+          "Handgrip dynamometry",
+          "CAT, mMRC, Borg dyspnea baseline",
+          "Pursed-lip breathing 6 reps × 4 sets",
+          "Diaphragmatic breathing supine 5 min",
+          "Inhaler technique check + written action plan",
+          "Education: pacing (4 P's), exacerbation triggers"
+        ], borg: "≤3" },
+      { n: 2, title: "Baseline conditioning",
+        items: [
+          "6MWT #2 (use best of two for prescription)",
+          "Treadmill 10 min @ 70% 6MWT speed",
+          "Cycle ergometer 5 min low load",
+          "Leg press 2×10 @ 50% 1-RM",
+          "Seated row 2×10",
+          "PLB throughout effort",
+          "Stretch (pectorals, hip flexors, hamstrings) 5 min"
+        ], borg: "4-5" },
+      { n: 3, title: "Add lower-body strength",
+        items: [
+          "Treadmill 12 min @ 70% 6MWT speed",
+          "Cycle 7 min low load",
+          "Leg press 2×10, Seated row 2×10",
+          "Knee extension 2×10 @ 50% 1-RM",
+          "Biceps curl 2×10 light",
+          "ACBT cycle ×3 if sputum present"
+        ], borg: "4-5" },
+      { n: 4, title: "Progress aerobic",
+        items: [
+          "Treadmill 15 min @ 75% 6MWT speed",
+          "Cycle 8 min",
+          "Resistance circuit 2×12 (leg press, row, knee ext, biceps)",
+          "Calf raises 2×10",
+          "Stair step 1×1 min if tolerated",
+          "SpO2 check at minutes 5 / 10 / 15"
+        ], borg: "5-6" },
+      { n: 5, title: "Continuous or interval",
+        items: [
+          "If SpO2 drops <88%: intervals 1 min walk : 1 min rest × 12",
+          "Otherwise: 18 min continuous @ 75-80% 6MWT speed",
+          "Resistance 3×10 (leg press, row, knee ext, biceps)",
+          "Lat pulldown 2×10"
+        ], borg: "5-6" },
+      { n: 6, title: "Add unsupported arm work",
+        items: [
+          "Aerobic 20 min @ 75-80% 6MWT speed",
+          "Resistance 3×10 (+5-10% load if last set RPE ≤6)",
+          "Unsupported 1-kg dowel raises 2×10",
+          "PLB on effort phase"
+        ], borg: "5-6" },
+      { n: 7, title: "Pacing for ADLs",
+        items: [
+          "Aerobic 22 min @ 80% 6MWT speed",
+          "Re-test 1-min sit-to-stand",
+          "Resistance 3×10 progressed loads",
+          "Pacing skill: shower / dressing simulation"
+        ], borg: "5-6" },
+      { n: 8, title: "Mid-program review",
+        items: [
+          "Repeat 6MWT (best of two)",
+          "Repeat CAT, mMRC",
+          "Re-prescribe: 80% of new 6MWT speed",
+          "Aerobic 25 min at new target",
+          "Resistance 3×10-12"
+        ], borg: "5-6" },
+      { n: 9, title: "Add balance work",
+        items: [
+          "Aerobic 25 min continuous (or 2×12 min intervals, 2-min recovery)",
+          "Tandem stance 3×30 s",
+          "Single-leg stance 3×15 s each side",
+          "Resistance 3×12"
+        ], borg: "5-6" },
+      { n: 10, title: "Begin home walking program",
+        items: [
+          "Aerobic 27 min",
+          "Resistance 3×12 (+5-10% load if last set RPE ≤6)",
+          "Pedometer / step-goal counseling (+500 steps/week)",
+          "Home walking plan handout"
+        ], borg: "5-6" },
+      { n: 11, title: "Stair circuit",
+        items: [
+          "Aerobic 30 min @ 80% peak speed",
+          "Stair circuit 2×1 min",
+          "Resistance 3×12",
+          "Reinforce ACBT independence"
+        ], borg: "5-6" },
+      { n: 12, title: "Reduced rest circuits",
+        items: [
+          "Aerobic 30 min",
+          "Resistance circuit 3×12 with 40-s rest",
+          "Reassess sit-to-stand and handgrip"
+        ], borg: "5-6" },
+      { n: 13, title: "Arm ergometer + functional task",
+        items: [
+          "Aerobic 30 min + arm ergometer 5 min",
+          "Functional: carry-and-walk with shopping bag",
+          "Sit-to-stand with object 2×10"
+        ], borg: "5-6" },
+      { n: 14, title: "Transition planning",
+        items: [
+          "Aerobic 30-35 min",
+          "Resistance 3×12 progressed",
+          "Discuss community gym / maintenance class / home program"
+        ], borg: "5-6" },
+      { n: 15, title: "Self-directed under supervision",
+        items: [
+          "Patient leads warm-up, aerobic, resistance",
+          "Troubleshoot home program issues",
+          "Review exacerbation action plan"
+        ], borg: "5-6" },
+      { n: 16, title: "Discharge",
+        items: [
+          "Final 6MWT, CAT, mMRC",
+          "Final sit-to-stand, handgrip",
+          "Document MCID achievement (≥30 m on 6MWT, ≥2 on CAT)",
+          "Provide 12-week home program + written action plan"
+        ], borg: "—" }
+    ]
+  },
+
+  asthma: {
+    label: "Asthma",
+    summary: "8-week conditioning + EIB-prevention warm-up program, 8 supervised sessions + 2-3 home/week.",
+    redFlags: [
+      "PEF <60% personal best",
+      "ACT <15",
+      "Current wheeze with SpO2 <94%",
+      "Recent ED visit / exacerbation (defer high-intensity)"
+    ],
+    stopRules: [
+      "PEF <60% best",
+      "Wheeze unrelieved by 2 puffs SABA after 10 min",
+      "SpO2 <92%",
+      "Speech in single words, accessory muscle use",
+      "Chest tightness with HR/BP instability",
+      "Cyanosis or drowsiness — emergency referral"
+    ],
+    targets: {
+      borgDyspnea: "4-7/10 (CR-10)",
+      spo2Floor: "≥92%",
+      pefDropFlag: "≥10% post-exercise = EIB"
+    },
+    sessions: [
+      { n: 1, title: "Assessment & Education",
+        items: [
+          "ACT, Nijmegen questionnaire, baseline PEF",
+          "6MWT, sit-to-stand",
+          "Inhaler / spacer technique check",
+          "Trigger map and written asthma action plan reviewed",
+          "Nasal-diaphragmatic breathing (Papworth) 10 min"
+        ], borg: "≤3" },
+      { n: 2, title: "EIB-prevention warm-up + base aerobic",
+        items: [
+          "PEF pre-session",
+          "Warm-up: 6 × 30-s brisk cycle sprints with 90-s recovery",
+          "Continuous cycle 15 min @ 60% HRR",
+          "Leg press, chest press, row 2×10 moderate",
+          "Breathing retraining 10 min",
+          "PEF post-session — document % drop"
+        ], borg: "4-5" },
+      { n: 3, title: "Postural drill + scapular setting",
+        items: [
+          "Sprint warm-up (6 × 30-s)",
+          "Aerobic 18 min @ 65% HRR",
+          "Resistance 2×12",
+          "Chin tucks, wall angels ×10",
+          "Reinforce nasal breathing during low-intensity blocks"
+        ], borg: "4-5" },
+      { n: 4, title: "Treadmill intervals",
+        items: [
+          "Sprint warm-up",
+          "Treadmill 1:1 intervals (1 min @ 75% HRmax : 1 min recovery) × 10",
+          "Resistance 3×10 progressed",
+          "Buteyko-style control pause practice"
+        ], borg: "5-6" },
+      { n: 5, title: "Continuous + aquatic option",
+        items: [
+          "Sprint warm-up",
+          "Continuous 25 min cycle/treadmill @ 70% HRR",
+          "Resistance 3×10",
+          "Introduce swimming/aquatic option if available",
+          "Reassess Nijmegen, PEF stability"
+        ], borg: "5-6" },
+      { n: 6, title: "Mixed-modality + VCD screen",
+        items: [
+          "Sprint warm-up",
+          "Aerobic 30 min mixed treadmill + cycle",
+          "Resistance 3×12 progressed",
+          "Vocal cord dysfunction screen if symptoms inspiratory"
+        ], borg: "5-6" },
+      { n: 7, title: "Outdoor-conditions strategy",
+        items: [
+          "Sprint warm-up",
+          "Aerobic 30-35 min @ 75% HRR",
+          "Resistance circuit 3×12 with 30-s rest",
+          "Discussion: scarf/mask in cold/dry air, indoor alternatives, pollen-time avoidance"
+        ], borg: "5-6" },
+      { n: 8, title: "Discharge",
+        items: [
+          "Repeat ACT, Nijmegen, 6MWT, sit-to-stand",
+          "Document outcomes (target ACT ↑≥3, 6MWD ↑≥30 m)",
+          "12-week home program with EIB warm-up template",
+          "Confirm action plan, SABA pre-exercise rule, ICS adherence"
+        ], borg: "—" }
+    ]
+  },
+
+  cabg: {
+    label: "Post-CABG",
+    summary: "Phase I inpatient (POD 1-7) + Phase II outpatient (36 sessions / 12 weeks). Sternal precautions / KYMITT.",
+    redFlags: [
+      "Sternal click / instability / pop",
+      "Wound dehiscence, drainage, fever",
+      "Post-op anemia (Hb <8)",
+      "Uncontrolled HF, pleural effusion compromising oxygenation",
+      "New arrhythmia (post-op AF common)"
+    ],
+    stopRules: [
+      "Angina or anginal-equivalent (jaw, arm, epigastric)",
+      "SBP fall ≥10 mmHg with ischemic signs / rising workload",
+      "SBP >250 or DBP >115",
+      "New ST changes, sustained VT, ≥2nd-degree AV block, multifocal PVCs increasing",
+      "Sternal click, pop, instability, drainage, fever",
+      "HR drop >10 bpm with workload",
+      "Borg dyspnea ≥7 or RPE >17",
+      "Patient request"
+    ],
+    targets: {
+      hrPhase1: "rest +20 bpm cap",
+      hrPhase2: "rest +20-30 bpm; 60-80% HRR by mid-program",
+      borgPhase1: "≤11-13 / Borg ≤3",
+      borgPhase2: "11-14 (6-20 scale) / 3-5 (CR-10)",
+      kymitt: "Elbows in the tube; load-by-symptom; avoid Valsalva; no driving 4 wk; no upper-body resistance until ≥6 wk + MD clearance"
+    },
+    sessions: [
+      // Phase I — Inpatient
+      { n: 1, phase: "Phase I", title: "POD 1 — Bed mobility & breathing",
+        items: [
+          "Bed mobility with KYMITT (log-roll using legs, push from elbow not palm)",
+          "Ankle pumps 10×/hr while awake",
+          "Splinted cough with pillow",
+          "Incentive spirometer 10 breaths/hr",
+          "Sit at edge of bed; transfer to chair if hemodynamically stable",
+          "Continuous vitals; target SpO2 ≥92%, HR rest +20 max"
+        ], borg: "≤3" },
+      { n: 2, phase: "Phase I", title: "POD 2 — Sit-to-stand & in-room walks",
+        items: [
+          "Sit-to-stand ×3-5",
+          "In-room walks 2-3×/day, 50-100 ft",
+          "AROM ankles/knees/hips; sub-90° shoulder AROM, elbows in tube",
+          "Pain control before mobilization"
+        ], borg: "≤3" },
+      { n: 3, phase: "Phase I", title: "POD 3 — Hall walks",
+        items: [
+          "Hall walk 100-200 ft × 2-3",
+          "Standing AROM",
+          "Marching in place",
+          "Reinforce KYMITT for ADLs (combing hair within tube, reaching)",
+          "Splinted cough q4h"
+        ], borg: "≤3" },
+      { n: 4, phase: "Phase I", title: "POD 4 — Add seated leg work",
+        items: [
+          "Hall walk 300-400 ft × 3",
+          "Standing AROM",
+          "Seated leg extensions 1×10 (no resistance)",
+          "Stairs assessment if discharge near (1 flight with rail)"
+        ], borg: "≤3" },
+      { n: 5, phase: "Phase I", title: "POD 5-7 — Discharge prep",
+        items: [
+          "Hall walks 500-800 ft × 2",
+          "Stairs 1 flight independently",
+          "Provide written home walking plan (5-10 min, 2-3×/day, RPE ≤11)",
+          "Driving restriction 4 weeks; no lifting >5-10 lb 6 weeks (or KYMITT load-by-symptom)",
+          "Phase II referral booked for week 2-4"
+        ], borg: "≤3" },
+      // Phase II — Outpatient
+      { n: 6, phase: "Phase II", title: "S1 (~wk 2-3) — Outpatient assessment",
+        items: [
+          "Full assessment incl. 6MWT (sub-max; stop if SpO2 <90% or RPE >13)",
+          "Telemetry baseline, BP, weight log review",
+          "Treadmill 10 min @ 1.5-2.0 mph, RPE 11-12",
+          "Stationary cycle 5 min low load",
+          "Lower-body stretching only",
+          "Education: KYMITT detail, weight monitoring (call MD if +2 kg/3 d), wound check"
+        ], borg: "11-12 / 3" },
+      { n: 7, phase: "Phase II", title: "S2 — Build aerobic",
+        items: [
+          "Treadmill 12 min RPE 11-13",
+          "Cycle 8 min",
+          "Upper-body AROM in tube",
+          "NO upper-body resistance"
+        ], borg: "11-13 / 3" },
+      { n: 8, phase: "Phase II", title: "S3 — Lower-body AROM",
+        items: [
+          "Treadmill 15 min",
+          "Cycle 10 min",
+          "Seated lower-body AROM 1×10",
+          "HR cap = rest +20 bpm"
+        ], borg: "12 / 3-4" },
+      { n: 9, phase: "Phase II", title: "S4 (wk ~3) — NuStep added",
+        items: [
+          "Aerobic 20 min split treadmill + cycle",
+          "NuStep 5 min",
+          "RPE 12-13"
+        ], borg: "12-13 / 4" },
+      { n: 10, phase: "Phase II", title: "S5 — Begin lower-body resistance",
+        items: [
+          "Aerobic 22 min",
+          "Leg press 1×10 light",
+          "Calf raise 1×10",
+          "Seated knee extension 1×10",
+          "NO upper-body load"
+        ], borg: "12-13 / 4" },
+      { n: 11, phase: "Phase II", title: "S6 (wk ~4) — Walking poles",
+        items: [
+          "Aerobic 25 min",
+          "Lower-body resistance 2×10",
+          "Light walking poles for posture (no pull)"
+        ], borg: "12-13 / 4" },
+      { n: 12, phase: "Phase II", title: "S7 — Driving clearance",
+        items: [
+          "Aerobic 25 min @ RPE 13",
+          "Resistance 2×12 lower body",
+          "Driving clearance discussion with MD"
+        ], borg: "13 / 4" },
+      { n: 13, phase: "Phase II", title: "S8 (wk ~5) — Add arm ergometer",
+        items: [
+          "Aerobic 30 min",
+          "Arm ergometer 3 min very low load if pain-free and ≥5 wk post-op",
+          "Sternum check"
+        ], borg: "13 / 4" },
+      { n: 14, phase: "Phase II", title: "S9 — Progress arm ergometer",
+        items: [
+          "Aerobic 30 min",
+          "Arm ergometer 5 min light",
+          "Lower-body resistance 2×12 progressed"
+        ], borg: "13 / 4" },
+      { n: 15, phase: "Phase II", title: "S10 (wk ~6) — Sternal union expected; intro UB resistance",
+        items: [
+          "Repeat 6MWT",
+          "Begin upper-body resistance — chest press / row at 1-3 lb or 5% body weight, 1×10 each",
+          "ONLY if no sternal click and surgeon-cleared",
+          "KYMITT respected throughout"
+        ], borg: "13 / 4" },
+      { n: 16, phase: "Phase II", title: "S11 — Combined UB + LB resistance",
+        items: [
+          "Aerobic 30-35 min",
+          "Upper-body resistance 1×10-12 light",
+          "Lower-body resistance 2×12"
+        ], borg: "13 / 4" },
+      { n: 17, phase: "Phase II", title: "S12 (wk ~7) — Intro intervals",
+        items: [
+          "Aerobic 35 min including 2×3-min intervals @ RPE 14",
+          "Resistance circuit (full body) 2×10-12 light"
+        ], borg: "13-14 / 4-5" },
+      { n: 18, phase: "Phase II", title: "S13 — Progress intensity",
+        items: [
+          "Aerobic 35-40 min",
+          "Resistance progressed 5-10% if tolerated"
+        ], borg: "13-14 / 4-5" },
+      { n: 19, phase: "Phase II", title: "S14 (wk ~8) — Functional tasks",
+        items: [
+          "Aerobic 40 min",
+          "Resistance 2×12 progressed",
+          "Functional: timed sit-to-stand, lift basket within KYMITT"
+        ], borg: "13-14 / 4-5" },
+      { n: 20, phase: "Phase II", title: "S15 — Mid-program 6MWT",
+        items: [
+          "Repeat 6MWT (mid-program)",
+          "Adjust prescription",
+          "Aerobic 40 min @ RPE 13-14",
+          "Resistance 2-3×10"
+        ], borg: "13-14 / 4-5" },
+      { n: 21, phase: "Phase II", title: "S16-18 (wk 9) — Stair climb",
+        items: [
+          "Aerobic 40 min interval/continuous mix",
+          "Resistance 3×10 progressed",
+          "Stair climb circuit 5-10 min"
+        ], borg: "13-14 / 4-5" },
+      { n: 22, phase: "Phase II", title: "S19-24 (wk 10-11) — Return to work prep",
+        items: [
+          "Aerobic 40-45 min, RPE 13-15 selectively",
+          "Resistance 3×10-12",
+          "Arm ergometer 10 min",
+          "Begin return-to-work conditioning specific tasks"
+        ], borg: "13-15 / 5" },
+      { n: 23, phase: "Phase II", title: "S25-30 (wk 11-12) — HIIT consideration",
+        items: [
+          "Aerobic 45 min including 4×4 min @ 80% HRR if HF-free and cleared",
+          "Resistance 3×12",
+          "Begin transition planning to Phase III"
+        ], borg: "13-15 / 5" },
+      { n: 24, phase: "Phase II", title: "S31-35 — Independence coaching",
+        items: [
+          "Maintain volume / intensity",
+          "Coach independence",
+          "Pedometer / HR-monitor self-management"
+        ], borg: "13-14 / 4-5" },
+      { n: 25, phase: "Phase II", title: "S36 — Discharge",
+        items: [
+          "Final 6MWT, sit-to-stand, DASI, PHQ-9",
+          "Lipid / BP / weight review",
+          "Provide Phase III / maintenance program"
+        ], borg: "—" }
+    ]
+  },
+
+  hf: {
+    label: "Heart Failure",
+    summary: "12-week supervised program (3x/week, 36 sessions). MICT base; HIIT in stable HFrEF only. HF-ACTION / REHAB-HF model.",
+    redFlags: [
+      "Weight gain >2 kg in 3 days",
+      "New orthopnea or PND",
+      "Resting HR >100 bpm",
+      "SBP <90 or symptomatic",
+      "New arrhythmia or increased edema",
+      "Recent decompensation hospitalization (require ≥1-6 wk stabilization)"
+    ],
+    stopRules: [
+      "SBP fall ≥10 mmHg below resting with workload (especially with symptoms)",
+      "SBP >180 / DBP >110 at peak",
+      "New angina, severe dyspnea (Borg ≥7), dizziness, ataxia, confusion",
+      "HR fall >10 bpm with rising workload",
+      "Sustained VT, rapid AF >130 bpm, new heart block, ICD shock or rate approaching detection",
+      "SpO2 <90%",
+      "New crackles audible at bases mid-session",
+      "Patient request"
+    ],
+    targets: {
+      borgInitial: "11-12 / 3",
+      borgMid: "12-13 / 4",
+      borgLate: "13-15 / 5 (selective HIIT only if stable, MD-cleared)",
+      hrCapEarly: "rest +10-15 bpm",
+      hrCapMid: "rest +20 bpm",
+      hrCapLate: "60-80% HRR (use RPE if AF or beta-blocker)",
+      mcid6mwd: "30 m",
+      mcidKccq: "5 points"
+    },
+    sessions: [
+      { n: 1, title: "S1 — Assessment & education",
+        items: [
+          "NYHA class, KCCQ, 6MWT (sub-max), SPPB, handgrip",
+          "Weight log review",
+          "Education: daily weighing, sodium <2-3 g/day, fluid limit (often 1.5-2 L)",
+          "Walk 10 min @ RPE 11",
+          "Diaphragmatic breathing 5 min"
+        ], borg: "11 / 3" },
+      { n: 2, title: "S2 — Build aerobic base",
+        items: [
+          "Walk/treadmill 10 min @ HR rest +10 bpm, RPE 11",
+          "Cycle 5 min low load",
+          "Lower-body AROM 1×10",
+          "Continuous telemetry; SpO2 ≥92%"
+        ], borg: "11 / 3" },
+      { n: 3, title: "S3 — Begin resistance + balance",
+        items: [
+          "Aerobic 12 min split treadmill / cycle",
+          "Leg press 1×10 @ 30% 1-RM",
+          "Seated row 1×10 light",
+          "Tandem stance 3×30 s"
+        ], borg: "11-12 / 3-4" },
+      { n: 4, title: "S4 (wk 2) — Add chest press",
+        items: [
+          "Aerobic 15 min @ RPE 11-12",
+          "Resistance 1×12 (leg press, row, chest press light)",
+          "HR cap = rest +15 bpm initially"
+        ], borg: "11-12 / 3-4" },
+      { n: 5, title: "S5 — Knee extension added",
+        items: [
+          "Aerobic 18 min",
+          "Resistance 2×10 progressed",
+          "Add knee extension",
+          "Reinforce daily weight log"
+        ], borg: "12 / 4" },
+      { n: 6, title: "S6 — Calf raises + sit-to-stand",
+        items: [
+          "Aerobic 20 min",
+          "Resistance 2×10",
+          "Calf raises, biceps curl 1-kg",
+          "Sit-to-stand 2×10"
+        ], borg: "12 / 4" },
+      { n: 7, title: "S7 (wk 3) — Recheck orthostatic BP",
+        items: [
+          "Aerobic 22 min @ RPE 12",
+          "Resistance 2×12",
+          "Orthostatic BP rechecked"
+        ], borg: "12 / 4" },
+      { n: 8, title: "S8 — Add single-leg balance",
+        items: [
+          "Aerobic 25 min",
+          "Resistance 2×12 progressed (5-10%)",
+          "Single-leg stance 3×15 s each side"
+        ], borg: "12-13 / 4" },
+      { n: 9, title: "S9 — Introduce IMT",
+        items: [
+          "Aerobic 25 min",
+          "Resistance circuit 2×12",
+          "IMT if MIP low: 30% MIP × 30 breaths × 2/day home"
+        ], borg: "12-13 / 4" },
+      { n: 10, title: "S10 (wk 4) — Stair-step practice",
+        items: [
+          "Aerobic 27 min",
+          "Resistance 2×12",
+          "Stair-step 1 min × 2"
+        ], borg: "12-13 / 4" },
+      { n: 11, title: "S11 — Raise HR cap",
+        items: [
+          "Aerobic 30 min @ RPE 12-13",
+          "HR cap = rest +20 bpm",
+          "Resistance 3×10"
+        ], borg: "12-13 / 4" },
+      { n: 12, title: "S12 — Re-test STS and gait",
+        items: [
+          "Aerobic 30 min",
+          "Resistance 3×10",
+          "Repeat sit-to-stand and gait speed"
+        ], borg: "12-13 / 4" },
+      { n: 13, title: "S13 (wk 5) — Interval intro",
+        items: [
+          "Aerobic 30 min including 2×3 min @ RPE 14 (interval intro)",
+          "Resistance 3×10-12"
+        ], borg: "12-14 / 4-5" },
+      { n: 14, title: "S14 — Carry-load functional",
+        items: [
+          "Aerobic 32 min",
+          "Resistance progressed 5-10%",
+          "Carry 2-kg load 20 m within tolerance"
+        ], borg: "13 / 4-5" },
+      { n: 15, title: "S15 — Mid-program 6MWT + KCCQ",
+        items: [
+          "Repeat 6MWT, KCCQ",
+          "Adjust intensity by new HRR / speed",
+          "Aerobic 35 min"
+        ], borg: "13 / 4-5" },
+      { n: 16, title: "S16-18 (wk 6) — HIIT consideration",
+        items: [
+          "Aerobic 35 min",
+          "Resistance 3×10 progressed",
+          "If stable HFrEF, no decompensation, ICD threshold respected: 4×2 min @ RPE 15 with 3-min active recovery"
+        ], borg: "13-15 / 5" },
+      { n: 17, title: "S19-21 (wk 7) — Balance circuit",
+        items: [
+          "Aerobic 35-40 min MICT or HIIT",
+          "Resistance 3×12",
+          "Balance circuit (tandem walk, single-leg stance, weight shifts)"
+        ], borg: "13-15 / 5" },
+      { n: 18, title: "S22-24 (wk 8) — Reassess SPPB",
+        items: [
+          "Aerobic 40 min",
+          "Resistance progressed",
+          "Reassess SPPB",
+          "Vocational return discussion"
+        ], borg: "13-15 / 5" },
+      { n: 19, title: "S25-27 (wk 9) — 4×4 HIIT if tolerated",
+        items: [
+          "Aerobic 40 min, mix continuous and HIIT (4×4 min @ 85-95% HRpeak with 3-min active recovery)",
+          "Resistance 3×12 with 30-s rest"
+        ], borg: "13-15 / 5" },
+      { n: 20, title: "S28-30 (wk 10) — Functional integration",
+        items: [
+          "Aerobic 40-45 min",
+          "Resistance 3×12 progressed",
+          "Functional integration (stairs, lifting, ADL simulation)"
+        ], borg: "13-15 / 5" },
+      { n: 21, title: "S31-33 (wk 11) — Transition planning",
+        items: [
+          "Aerobic 45 min",
+          "Resistance 3×12",
+          "Begin transition: community / home, telehealth maintenance"
+        ], borg: "13-14 / 4-5" },
+      { n: 22, title: "S34-35 (wk 12) — Self-directed",
+        items: [
+          "Self-directed under supervision",
+          "Confirm independence with HR / RPE self-monitoring"
+        ], borg: "13-14 / 4-5" },
+      { n: 23, title: "S36 — Discharge",
+        items: [
+          "Final 6MWT, KCCQ, SPPB, handgrip",
+          "Document outcomes (Δ6MWD ≥30 m MCID, ΔKCCQ ≥5)",
+          "Home program; HF action plan; daily weight log template"
+        ], borg: "—" }
+    ]
+  }
+};
+
+// 6MWT script — verbatim ATS 2002
+window.CREX_6MWT_SCRIPT = {
+  intro: "The object of this test is to walk as far as possible for 6 minutes. You will walk back and forth in this hallway. Six minutes is a long time to walk, so you will be exerting yourself. You will probably get out of breath or become exhausted. You are permitted to slow down, to stop, and to rest as necessary. You may lean against the wall while resting, but resume walking as soon as you are able. You will be walking back and forth around the cones. You should pivot briskly around the cones and continue back the other way without hesitation. Now I'm going to show you. Please watch the way I turn without hesitation.",
+  ready: "Are you ready to do that? I am going to use this counter to keep track of the number of laps you complete. I will click it each time you turn around at this starting line. Remember that the object is to walk AS FAR AS POSSIBLE for 6 minutes, but don't run or jog. Start now, or whenever you are ready.",
+  cues: [
+    { atSec: 60,  text: "You are doing well. You have 5 minutes to go." },
+    { atSec: 120, text: "Keep up the good work. You have 4 minutes to go." },
+    { atSec: 180, text: "You are doing well. You are halfway done." },
+    { atSec: 240, text: "Keep up the good work. You have only 2 minutes left." },
+    { atSec: 300, text: "You are doing well. You have only 1 minute to go." },
+    { atSec: 345, text: "In a moment I'm going to tell you to stop. When I do, just stop right where you are and I will come to you." },
+    { atSec: 360, text: "Stop." }
+  ]
+};
+
+// Reference equations (Enright & Sherrill 1998)
+window.CREX_PREDICT_6MWD = function (sex, age, height_cm, weight_kg) {
+  if (!age || !height_cm || !weight_kg) return null;
+  if (sex === "M") {
+    const pred = (7.57 * height_cm) - (5.02 * age) - (1.76 * weight_kg) - 309;
+    return { predicted: Math.round(pred), lln: Math.round(pred - 153) };
+  }
+  if (sex === "F") {
+    const pred = (2.11 * height_cm) - (2.29 * weight_kg) - (5.78 * age) + 667;
+    return { predicted: Math.round(pred), lln: Math.round(pred - 139) };
+  }
+  return null;
+};
+
+// VO2peak estimate (Cahalin 1996a, simple)
+window.CREX_VO2_FROM_6MWD = function (distance_m) {
+  if (!distance_m) return null;
+  return +(0.03 * distance_m + 3.98).toFixed(1);
+};
+
+;
+(() => {
+  "use strict";
+
+  const KEYS = {
+    patients: "cr-ex.patients.v1",
+    tests:    "cr-ex.tests.v1",
+    sessions: "cr-ex.sessions.v1",
+  };
+
+  const PROGRAMS = window.CREX_PROGRAMS;
+  const SCRIPT_6MWT = window.CREX_6MWT_SCRIPT;
+
+  // ---------------------- storage ----------------------
+  const store = {
+    load(key)        { try { return JSON.parse(localStorage.getItem(key)) || []; } catch { return []; } },
+    save(key, value) { localStorage.setItem(key, JSON.stringify(value)); },
+  };
+
+  const state = {
+    view: "patients",
+    selectedPatientId: null,
+    patients: store.load(KEYS.patients),
+    tests:    store.load(KEYS.tests),
+    sessions: store.load(KEYS.sessions),
+    test6mwt: null,   // active test runtime
+  };
+
+  function persist() {
+    store.save(KEYS.patients, state.patients);
+    store.save(KEYS.tests,    state.tests);
+    store.save(KEYS.sessions, state.sessions);
+  }
+
+  function uid() {
+    return crypto.randomUUID ? crypto.randomUUID() : "id-" + Date.now() + "-" + Math.random().toString(16).slice(2);
+  }
+
+  function todayIso() {
+    const d = new Date();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${d.getFullYear()}-${m}-${day}`;
+  }
+
+  function getPatient(id)    { return state.patients.find(p => p.id === id); }
+  function patientTests(id)  { return state.tests.filter(t => t.patientId === id).sort((a,b)=>b.createdAt-a.createdAt); }
+  function patientSessions(id){return state.sessions.filter(s => s.patientId === id).sort((a,b)=>a.sessionN-b.sessionN || a.createdAt-b.createdAt);}
+
+  // ---------------------- DOM helpers ----------------------
+  const $ = (sel, root=document) => root.querySelector(sel);
+  const $ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
+
+  function el(tag, attrs = {}, ...children) {
+    const node = document.createElement(tag);
+    for (const [k, v] of Object.entries(attrs)) {
+      if (k === "class") node.className = v;
+      else if (k === "html") node.innerHTML = v;
+      else if (k.startsWith("on") && typeof v === "function") node.addEventListener(k.slice(2), v);
+      else if (v === true) node.setAttribute(k, "");
+      else if (v !== false && v != null) node.setAttribute(k, v);
+    }
+    for (const c of children.flat()) {
+      if (c == null || c === false) continue;
+      node.appendChild(typeof c === "string" ? document.createTextNode(c) : c);
+    }
+    return node;
+  }
+
+  // ---------------------- views ----------------------
+  function render() {
+    $(".tab").forEach(t => t.classList.toggle("active", t.dataset.view === state.view));
+    const root = $("#app");
+    root.innerHTML = "";
+    const view = ({
+      patients:  renderPatients,
+      sixmwt:    renderSixmwt,
+      sessions:  renderSessions,
+      reference: renderReference,
+    })[state.view] || renderPatients;
+    root.appendChild(view());
+  }
+
+  // ===== Patients view =====
+  function renderPatients() {
+    const wrap = el("section", { class: "view" });
+
+    wrap.appendChild(el("div", { class: "card" },
+      el("h2", {}, "Add patient"),
+      patientForm()
+    ));
+
+    const list = el("div", { class: "card" }, el("h2", {}, "Patient list"));
+    if (state.patients.length === 0) {
+      list.appendChild(el("div", { class: "empty" }, "No patients yet."));
+    } else {
+      const ul = el("ul", { class: "patient-list" });
+      for (const p of [...state.patients].sort((a,b)=>a.name.localeCompare(b.name))) {
+        const tests = patientTests(p.id);
+        const sessions = patientSessions(p.id);
+        ul.appendChild(el("li", { class: "patient-item" },
+          el("div", { class: "patient-main" },
+            el("div", { class: "patient-name" }, p.name),
+            el("div", { class: "patient-meta" },
+              `${p.condition ? PROGRAMS[p.condition]?.label || p.condition : "—"} · `,
+              `${p.age || "?"} yr · ${p.sex || "?"} · ${p.height || "?"} cm · ${p.weight || "?"} kg`
+            ),
+            el("div", { class: "patient-meta" },
+              `${tests.length} 6MWT${tests.length===1?"":"s"} · ${sessions.length} session${sessions.length===1?"":"s"}`
+            ),
+          ),
+          el("div", { class: "patient-actions" },
+            el("button", { class: "btn btn-sm", onclick: () => { state.selectedPatientId = p.id; state.view = "sixmwt"; render(); } }, "6MWT"),
+            el("button", { class: "btn btn-sm", onclick: () => { state.selectedPatientId = p.id; state.view = "sessions"; render(); } }, "Sessions"),
+            el("button", { class: "btn btn-sm btn-ghost", onclick: () => deletePatient(p.id) }, "Delete"),
+          )
+        ));
+      }
+      list.appendChild(ul);
+    }
+    wrap.appendChild(list);
+    return wrap;
+  }
+
+  function patientForm() {
+    const form = el("form", { class: "form-grid", onsubmit: (e) => {
+      e.preventDefault();
+      const fd = new FormData(form);
+      const patient = {
+        id: uid(),
+        createdAt: Date.now(),
+        name: fd.get("name").trim(),
+        age: Number(fd.get("age")) || null,
+        sex: fd.get("sex"),
+        height: Number(fd.get("height")) || null,
+        weight: Number(fd.get("weight")) || null,
+        condition: fd.get("condition"),
+        comorbidities: fd.get("comorbidities").trim(),
+        baselineO2: fd.get("baselineO2").trim(),
+        notes: fd.get("notes").trim(),
+      };
+      if (!patient.name || !patient.condition) return;
+      state.patients.push(patient);
+      persist();
+      render();
+    }});
+    form.appendChild(field("Name", el("input", { name: "name", required: true, placeholder: "e.g. Patient ID or initials" })));
+    form.appendChild(field("Age", el("input", { name: "age", type: "number", min: 0, max: 120 })));
+    form.appendChild(field("Sex", select("sex", [["", "—"], ["M","Male"], ["F","Female"], ["X","Other"]])));
+    form.appendChild(field("Height (cm)", el("input", { name: "height", type: "number", step: "0.1" })));
+    form.appendChild(field("Weight (kg)", el("input", { name: "weight", type: "number", step: "0.1" })));
+    form.appendChild(field("Condition", select("condition", [
+      ["", "— select —"],
+      ["copd","COPD"],
+      ["asthma","Asthma"],
+      ["cabg","Post-CABG"],
+      ["hf","Heart Failure"],
+    ], true)));
+    form.appendChild(field("Baseline O2", el("input", { name: "baselineO2", placeholder: "e.g. RA, 2L NC" })));
+    form.appendChild(field("Comorbidities", el("input", { name: "comorbidities", placeholder: "e.g. T2DM, HTN" })));
+    form.appendChild(field("Notes", el("input", { name: "notes" }), { full: true }));
+    form.appendChild(el("div", { class: "form-actions" },
+      el("button", { class: "btn btn-primary", type: "submit" }, "Add patient")
+    ));
+    return form;
+  }
+
+  function deletePatient(id) {
+    if (!confirm("Delete patient and all their tests/sessions?")) return;
+    state.patients = state.patients.filter(p => p.id !== id);
+    state.tests    = state.tests.filter(t => t.patientId !== id);
+    state.sessions = state.sessions.filter(s => s.patientId !== id);
+    if (state.selectedPatientId === id) state.selectedPatientId = null;
+    persist();
+    render();
+  }
+
+  // ===== 6MWT view =====
+  function renderSixmwt() {
+    const wrap = el("section", { class: "view" });
+    wrap.appendChild(patientPicker());
+
+    const p = state.selectedPatientId ? getPatient(state.selectedPatientId) : null;
+    if (!p) {
+      wrap.appendChild(el("div", { class: "card empty" }, "Select a patient to begin a 6MWT."));
+      return wrap;
+    }
+
+    if (state.test6mwt && state.test6mwt.patientId === p.id) {
+      wrap.appendChild(renderActiveTest(p));
+    } else {
+      wrap.appendChild(renderTestSetup(p));
+    }
+
+    // History
+    const tests = patientTests(p.id);
+    const hist = el("div", { class: "card" }, el("h2", {}, "Previous tests"));
+    if (tests.length === 0) {
+      hist.appendChild(el("div", { class: "empty" }, "No tests yet."));
+    } else {
+      const ul = el("ul", { class: "history" });
+      for (const t of tests) {
+        const pred = window.CREX_PREDICT_6MWD(p.sex, p.age, p.height, p.weight);
+        const pct = pred && t.distance ? Math.round(100 * t.distance / pred.predicted) : null;
+        ul.appendChild(el("li", { class: "history-item" },
+          el("div", { class: "history-main" },
+            el("div", { class: "history-title" }, `${t.date} · ${t.distance} m${pct ? ` (${pct}% pred)` : ""}`),
+            el("div", { class: "history-meta" },
+              `Pre HR ${t.pre.hr||"-"} · BP ${t.pre.sbp||"-"}/${t.pre.dbp||"-"} · SpO2 ${t.pre.spo2||"-"}% · Borg ${t.pre.borgD||"-"}`
+            ),
+            el("div", { class: "history-meta" },
+              `Post HR ${t.post.hr||"-"} · SpO2 nadir ${t.spo2Nadir||"-"}% · Borg ${t.post.borgD||"-"} · Stops ${t.stops||0}`
+            ),
+            t.notes ? el("div", { class: "history-meta" }, "Notes: " + t.notes) : null
+          ),
+          el("button", { class: "btn btn-sm btn-ghost", onclick: () => deleteTest(t.id) }, "Delete")
+        ));
+      }
+      hist.appendChild(ul);
+    }
+    wrap.appendChild(hist);
+    return wrap;
+  }
+
+  function deleteTest(id) {
+    if (!confirm("Delete this test?")) return;
+    state.tests = state.tests.filter(t => t.id !== id);
+    persist();
+    render();
+  }
+
+  function renderTestSetup(p) {
+    const card = el("div", { class: "card" }, el("h2", {}, `New 6MWT — ${p.name}`));
+    card.appendChild(el("div", { class: "info" }, "Patient should rest seated for 10 minutes. Take baseline vitals before starting."));
+    const form = el("form", { class: "form-grid", onsubmit: (e) => {
+      e.preventDefault();
+      const fd = new FormData(form);
+      state.test6mwt = {
+        id: uid(),
+        patientId: p.id,
+        date: todayIso(),
+        pre: {
+          hr: numOrNull(fd.get("hr")),
+          sbp: numOrNull(fd.get("sbp")),
+          dbp: numOrNull(fd.get("dbp")),
+          spo2: numOrNull(fd.get("spo2")),
+          borgD: numOrNull(fd.get("borgD")),
+          borgRPE: numOrNull(fd.get("borgRPE")),
+        },
+        o2: fd.get("o2").trim(),
+        aid: fd.get("aid"),
+        contraindications: fd.get("contraind").trim(),
+        // runtime
+        running: false,
+        startedAt: null,
+        elapsed: 0,
+        laps: 0,
+        spo2Readings: [],
+        spo2Nadir: null,
+        cuesGiven: [],
+        log: [],
+      };
+      // Pre-test contraindication check
+      const ci = checkContraindications(state.test6mwt.pre);
+      if (ci.length) {
+        if (!confirm("⚠ Possible contraindication:\n\n" + ci.join("\n") + "\n\nProceed anyway?")) {
+          state.test6mwt = null;
+          return;
+        }
+      }
+      render();
+    }});
+    form.appendChild(field("Resting HR (bpm)", el("input", { name: "hr", type: "number", min: 0, max: 250, required: true })));
+    form.appendChild(field("Resting SBP", el("input", { name: "sbp", type: "number", min: 0, max: 300 })));
+    form.appendChild(field("Resting DBP", el("input", { name: "dbp", type: "number", min: 0, max: 200 })));
+    form.appendChild(field("Resting SpO2 (%)", el("input", { name: "spo2", type: "number", min: 0, max: 100, required: true })));
+    form.appendChild(field("Borg dyspnea (0-10)", el("input", { name: "borgD", type: "number", min: 0, max: 10, step: "0.5" })));
+    form.appendChild(field("Borg RPE (0-10)", el("input", { name: "borgRPE", type: "number", min: 0, max: 10, step: "0.5" })));
+    form.appendChild(field("O2 supplementation", el("input", { name: "o2", placeholder: "e.g. RA, 2L NC" })));
+    form.appendChild(field("Walking aid", select("aid", [["none","None"],["cane","Cane"],["walker","Walker"],["rollator","Rollator"]])));
+    form.appendChild(field("Contraindications notes", el("input", { name: "contraind", placeholder: "If any" }), { full: true }));
+    form.appendChild(el("div", { class: "form-actions" },
+      el("button", { class: "btn btn-primary", type: "submit" }, "Read instructions to patient →")
+    ));
+    card.appendChild(form);
+    return card;
+  }
+
+  function checkContraindications(v) {
+    const out = [];
+    if (v.hr  != null && v.hr  > 120) out.push(`Resting HR ${v.hr} > 120 bpm (relative)`);
+    if (v.sbp != null && v.sbp > 180) out.push(`Resting SBP ${v.sbp} > 180 mmHg (relative)`);
+    if (v.dbp != null && v.dbp > 100) out.push(`Resting DBP ${v.dbp} > 100 mmHg (relative)`);
+    return out;
+  }
+
+  function renderActiveTest(p) {
+    const t = state.test6mwt;
+    const card = el("div", { class: "card" }, el("h2", {}, `6MWT in progress — ${p.name}`));
+
+    // Verbatim ATS instructions block (collapsible)
+    const instr = el("details", { class: "instr", open: !t.running ? true : false },
+      el("summary", {}, "ATS verbatim instructions (read aloud)"),
+      el("p", { class: "script" }, SCRIPT_6MWT.intro),
+      el("p", { class: "script" }, "(Demonstrate one lap.)"),
+      el("p", { class: "script" }, SCRIPT_6MWT.ready)
+    );
+    card.appendChild(instr);
+
+    // Timer & lap counter
+    const elapsed = t.elapsed;
+    const remain = Math.max(0, 360 - elapsed);
+    const mm = String(Math.floor(remain / 60)).padStart(1, "0");
+    const ss = String(remain % 60).padStart(2, "0");
+    const timerEl = el("div", { class: "timer" }, `${mm}:${ss}`);
+    const progress = el("div", { class: "progress-bar" },
+      el("div", { class: "progress-fill", style: `width:${Math.min(100, (elapsed/360)*100)}%` })
+    );
+
+    const cueText = t.lastCue ? el("div", { class: "cue" }, t.lastCue) : el("div", { class: "cue muted" }, t.running ? "Stay quiet between cues." : "Press Start when patient begins walking.");
+
+    const controls = el("div", { class: "test-controls" },
+      !t.running
+        ? el("button", { class: "btn btn-primary btn-lg", onclick: startTimer }, "Start")
+        : el("button", { class: "btn btn-warn btn-lg", onclick: pauseTimer }, "Pause / Stop early"),
+      el("div", { class: "lap-block" },
+        el("div", { class: "lap-label" }, "Laps"),
+        el("div", { class: "lap-count" }, String(t.laps)),
+        el("div", { class: "lap-buttons" },
+          el("button", { class: "btn btn-sm", onclick: () => { state.test6mwt.laps += 1; render(); } }, "+1"),
+          el("button", { class: "btn btn-sm btn-ghost", onclick: () => { state.test6mwt.laps = Math.max(0, state.test6mwt.laps - 1); render(); } }, "-1")
+        )
+      ),
+      el("div", { class: "spo2-block" },
+        el("div", { class: "lap-label" }, "Log SpO2"),
+        el("input", { id: "spo2-log", type: "number", min: 0, max: 100, placeholder: "%" }),
+        el("button", { class: "btn btn-sm", onclick: logSpo2 }, "Log"),
+        el("div", { class: "muted" }, "Nadir: " + (t.spo2Nadir == null ? "—" : t.spo2Nadir + "%"))
+      ),
+      el("div", { class: "stop-block" },
+        el("div", { class: "lap-label" }, "Stops"),
+        el("button", { class: "btn btn-sm btn-warn", onclick: () => { state.test6mwt.stops = (state.test6mwt.stops||0)+1; render(); } }, "+1 stop"),
+        el("div", { class: "muted" }, "Total: " + (t.stops || 0))
+      )
+    );
+
+    card.appendChild(timerEl);
+    card.appendChild(progress);
+    card.appendChild(cueText);
+    card.appendChild(controls);
+
+    // Stop criteria reminder
+    card.appendChild(el("details", { class: "stop-criteria" },
+      el("summary", {}, "Stop criteria — terminate if:"),
+      el("ul", {},
+        ...["Chest pain / angina","Intolerable dyspnea","Leg cramps / claudication","Staggering / ataxia","Diaphoresis with pallor or cyanosis","Pale or ashen appearance","Confusion or light-headedness"]
+          .map(s => el("li", {}, s))
+      )
+    ));
+
+    // Post-test form (visible after timer finishes or stopped)
+    if (t.elapsed >= 360 || t.stoppedEarly) {
+      card.appendChild(renderPostTestForm(p, t));
+    }
+
+    // Cancel
+    card.appendChild(el("div", { class: "form-actions" },
+      el("button", { class: "btn btn-sm btn-ghost", onclick: () => {
+        if (confirm("Cancel this test? Data will be discarded.")) {
+          stopTimer();
+          state.test6mwt = null;
+          render();
+        }
+      } }, "Cancel test")
+    ));
+
+    return card;
+  }
+
+  let timerHandle = null;
+  function startTimer() {
+    const t = state.test6mwt;
+    if (!t || t.running) return;
+    t.running = true;
+    t.startedAt = Date.now() - (t.elapsed * 1000);
+    tickTimer();
+    timerHandle = setInterval(tickTimer, 1000);
+    render();
+  }
+  function pauseTimer() {
+    const t = state.test6mwt;
+    if (!t) return;
+    t.running = false;
+    t.stoppedEarly = t.elapsed < 360;
+    clearInterval(timerHandle);
+    timerHandle = null;
+    render();
+  }
+  function stopTimer() {
+    clearInterval(timerHandle);
+    timerHandle = null;
+  }
+  function tickTimer() {
+    const t = state.test6mwt;
+    if (!t || !t.running) return;
+    const sec = Math.floor((Date.now() - t.startedAt) / 1000);
+    t.elapsed = Math.min(sec, 360);
+
+    // Find next cue
+    for (const c of SCRIPT_6MWT.cues) {
+      if (t.elapsed >= c.atSec && !t.cuesGiven.includes(c.atSec)) {
+        t.cuesGiven.push(c.atSec);
+        t.lastCue = c.text;
+        speak(c.text);
+      }
+    }
+
+    if (t.elapsed >= 360) {
+      t.running = false;
+      stopTimer();
+    }
+    render();
+  }
+  function speak(text) {
+    if (!("speechSynthesis" in window)) return;
+    try {
+      const u = new SpeechSynthesisUtterance(text);
+      u.rate = 0.95;
+      window.speechSynthesis.speak(u);
+    } catch {}
+  }
+  function logSpo2() {
+    const input = $("#spo2-log");
+    if (!input) return;
+    const v = Number(input.value);
+    if (!v) return;
+    const t = state.test6mwt;
+    t.spo2Readings.push({ atSec: t.elapsed, value: v });
+    if (t.spo2Nadir == null || v < t.spo2Nadir) t.spo2Nadir = v;
+    input.value = "";
+    render();
+  }
+
+  function renderPostTestForm(p, t) {
+    const div = el("div", { class: "subcard" }, el("h3", {}, "Post-test vitals & save"));
+    const form = el("form", { class: "form-grid", onsubmit: (e) => {
+      e.preventDefault();
+      const fd = new FormData(form);
+      const partialMeters = numOrNull(fd.get("partial")) || 0;
+      const distance = (t.laps * 30) + partialMeters;
+
+      const post = {
+        hr: numOrNull(fd.get("phr")),
+        sbp: numOrNull(fd.get("psbp")),
+        dbp: numOrNull(fd.get("pdbp")),
+        spo2: numOrNull(fd.get("pspo2")),
+        borgD: numOrNull(fd.get("pborgD")),
+        borgRPE: numOrNull(fd.get("pborgRPE")),
+        recovery1: numOrNull(fd.get("rec1")),
+        recovery2: numOrNull(fd.get("rec2")),
+      };
+
+      const record = {
+        id: t.id,
+        patientId: p.id,
+        date: t.date,
+        createdAt: Date.now(),
+        pre: t.pre,
+        post,
+        o2: t.o2,
+        aid: t.aid,
+        contraindications: t.contraindications,
+        elapsedSec: t.elapsed,
+        laps: t.laps,
+        partialMeters,
+        distance,
+        spo2Nadir: t.spo2Nadir,
+        spo2Readings: t.spo2Readings,
+        stops: t.stops || 0,
+        stoppedEarly: !!t.stoppedEarly,
+        terminationReason: fd.get("termReason").trim(),
+        notes: fd.get("notes").trim(),
+      };
+
+      state.tests.push(record);
+      persist();
+      state.test6mwt = null;
+
+      // Show summary
+      alert(buildTestSummary(p, record));
+      render();
+    }});
+
+    form.appendChild(field("Partial lap (m)", el("input", { name: "partial", type: "number", min: 0, max: 30, step: "0.1", required: true, placeholder: "0-30" })));
+    form.appendChild(field("Post HR", el("input", { name: "phr", type: "number", min: 0, max: 250 })));
+    form.appendChild(field("Post SBP", el("input", { name: "psbp", type: "number", min: 0, max: 300 })));
+    form.appendChild(field("Post DBP", el("input", { name: "pdbp", type: "number", min: 0, max: 200 })));
+    form.appendChild(field("Post SpO2", el("input", { name: "pspo2", type: "number", min: 0, max: 100 })));
+    form.appendChild(field("Post Borg dyspnea", el("input", { name: "pborgD", type: "number", min: 0, max: 10, step: "0.5" })));
+    form.appendChild(field("Post Borg RPE", el("input", { name: "pborgRPE", type: "number", min: 0, max: 10, step: "0.5" })));
+    form.appendChild(field("Recovery HR @ 1 min", el("input", { name: "rec1", type: "number", min: 0, max: 250 })));
+    form.appendChild(field("Recovery HR @ 2 min", el("input", { name: "rec2", type: "number", min: 0, max: 250 })));
+    form.appendChild(field("Termination reason (if early)", el("input", { name: "termReason" }), { full: true }));
+    form.appendChild(field("Notes", el("input", { name: "notes" }), { full: true }));
+    form.appendChild(el("div", { class: "form-actions" },
+      el("button", { class: "btn btn-primary", type: "submit" }, "Save test")
+    ));
+    div.appendChild(form);
+    return div;
+  }
+
+  function buildTestSummary(p, r) {
+    const pred = window.CREX_PREDICT_6MWD(p.sex, p.age, p.height, p.weight);
+    const vo2 = window.CREX_VO2_FROM_6MWD(r.distance);
+    const speedMmin = +(r.distance / 6).toFixed(1);
+    const targetSpeed = +(speedMmin * 0.8).toFixed(1);
+    const lines = [
+      `6MWT — ${p.name} — ${r.date}`,
+      `Distance: ${r.distance} m`,
+      pred ? `Predicted (Enright): ${pred.predicted} m  (LLN ${pred.lln} m)` : null,
+      pred ? `% predicted: ${Math.round(100*r.distance/pred.predicted)}%` : null,
+      vo2 ? `Estimated VO2peak (Cahalin): ${vo2} mL/kg/min` : null,
+      `Avg walking speed: ${speedMmin} m/min`,
+      `Training target (80% of avg speed): ${targetSpeed} m/min`,
+      `SpO2 nadir: ${r.spo2Nadir ?? "—"}%`,
+      r.spo2Nadir != null && r.pre.spo2 != null ? `SpO2 drop: ${r.pre.spo2 - r.spo2Nadir}%` : null,
+      r.spo2Nadir != null && r.spo2Nadir < 88 ? "⚠ Desaturation <88% — consider ambulatory O2 evaluation." : null,
+      r.distance < 350 && p.condition === "copd" ? "⚠ COPD: 6MWD <350 m — increased mortality / hospitalization risk." : null,
+      r.distance < 332 ? "⚠ <332 m — adverse prognostic threshold (PAH; consider in HF/COPD context)." : null,
+    ].filter(Boolean);
+    return lines.join("\n");
+  }
+
+  // ===== Sessions view =====
+  function renderSessions() {
+    const wrap = el("section", { class: "view" });
+    wrap.appendChild(patientPicker());
+
+    const p = state.selectedPatientId ? getPatient(state.selectedPatientId) : null;
+    if (!p) {
+      wrap.appendChild(el("div", { class: "card empty" }, "Select a patient to start a session."));
+      return wrap;
+    }
+    const program = PROGRAMS[p.condition];
+    if (!program) {
+      wrap.appendChild(el("div", { class: "card empty" }, "No program available for this condition."));
+      return wrap;
+    }
+
+    if (state.activeSession && state.activeSession.patientId === p.id) {
+      wrap.appendChild(renderActiveSession(p, program));
+    } else {
+      wrap.appendChild(renderSessionPicker(p, program));
+    }
+
+    // History
+    const sessions = patientSessions(p.id);
+    const hist = el("div", { class: "card" }, el("h2", {}, "Session history"));
+    if (sessions.length === 0) {
+      hist.appendChild(el("div", { class: "empty" }, "No sessions yet."));
+    } else {
+      const ul = el("ul", { class: "history" });
+      for (const s of sessions) {
+        const tmpl = program.sessions.find(x => x.n === s.sessionN);
+        ul.appendChild(el("li", { class: "history-item" },
+          el("div", { class: "history-main" },
+            el("div", { class: "history-title" }, `S${s.sessionN}: ${s.title} · ${s.date}`),
+            el("div", { class: "history-meta" },
+              `Pre HR ${s.pre.hr||"-"} · BP ${s.pre.sbp||"-"}/${s.pre.dbp||"-"} · SpO2 ${s.pre.spo2||"-"}% · Borg ${s.pre.borgD||"-"}`
+            ),
+            el("div", { class: "history-meta" },
+              `Items completed: ${s.completed.length}/${(tmpl?.items||[]).length} · Adverse: ${s.adverse || "none"}`
+            ),
+            s.notes ? el("div", { class: "history-meta" }, "Notes: " + s.notes) : null
+          ),
+          el("button", { class: "btn btn-sm btn-ghost", onclick: () => deleteSession(s.id) }, "Delete")
+        ));
+      }
+      hist.appendChild(ul);
+    }
+    wrap.appendChild(hist);
+    return wrap;
+  }
+
+  function deleteSession(id) {
+    if (!confirm("Delete this session record?")) return;
+    state.sessions = state.sessions.filter(s => s.id !== id);
+    persist();
+    render();
+  }
+
+  function renderSessionPicker(p, program) {
+    const card = el("div", { class: "card" }, el("h2", {}, `Sessions — ${p.name} (${program.label})`));
+    card.appendChild(el("div", { class: "info" }, program.summary));
+
+    const completedNs = new Set(patientSessions(p.id).map(s => s.sessionN));
+    const ul = el("ul", { class: "session-list" });
+    for (const s of program.sessions) {
+      const done = completedNs.has(s.n);
+      ul.appendChild(el("li", { class: "session-row" + (done ? " done" : "") },
+        el("div", { class: "session-row-main" },
+          el("div", { class: "session-row-title" }, `${s.phase ? s.phase + " · " : ""}S${s.n}: ${s.title}`),
+          el("div", { class: "session-row-meta" }, `${s.items.length} items · target Borg ${s.borg}`)
+        ),
+        el("button", { class: "btn btn-sm" + (done ? " btn-ghost" : " btn-primary"), onclick: () => startSession(p, s) }, done ? "Repeat" : "Start")
+      ));
+    }
+    card.appendChild(ul);
+    return card;
+  }
+
+  function startSession(p, sessionTemplate) {
+    state.activeSession = {
+      id: uid(),
+      patientId: p.id,
+      sessionN: sessionTemplate.n,
+      title: sessionTemplate.title,
+      phase: sessionTemplate.phase || null,
+      borgTarget: sessionTemplate.borg,
+      template: sessionTemplate,
+      pre: null,
+      completed: [],
+      itemNotes: {},
+      vitalsDuring: [],
+      adverse: "",
+      notes: "",
+      step: "pre",  // pre -> exercise -> post
+    };
+    render();
+  }
+
+  function renderActiveSession(p, program) {
+    const s = state.activeSession;
+    const card = el("div", { class: "card" }, el("h2", {}, `S${s.sessionN}: ${s.title} — ${p.name}`));
+    card.appendChild(el("div", { class: "info" }, `Target Borg dyspnea / RPE: ${s.borgTarget}`));
+
+    // Red flags (always visible)
+    card.appendChild(el("details", { class: "redflags" },
+      el("summary", {}, "Defer-the-day red flags"),
+      el("ul", {}, ...program.redFlags.map(r => el("li", {}, r)))
+    ));
+
+    if (s.step === "pre") {
+      card.appendChild(renderSessionPreForm(p, s));
+    } else if (s.step === "exercise") {
+      card.appendChild(renderSessionChecklist(p, s, program));
+    } else if (s.step === "post") {
+      card.appendChild(renderSessionPostForm(p, s));
+    }
+
+    card.appendChild(el("div", { class: "form-actions" },
+      el("button", { class: "btn btn-sm btn-ghost", onclick: () => {
+        if (confirm("Cancel this session? Data will be discarded.")) {
+          state.activeSession = null;
+          render();
+        }
+      } }, "Cancel session")
+    ));
+    return card;
+  }
+
+  function renderSessionPreForm(p, s) {
+    const div = el("div", { class: "subcard" }, el("h3", {}, "Pre-session vitals"));
+    const form = el("form", { class: "form-grid", onsubmit: (e) => {
+      e.preventDefault();
+      const fd = new FormData(form);
+      s.date = todayIso();
+      s.pre = {
+        weight: numOrNull(fd.get("weight")),
+        weightChange3d: numOrNull(fd.get("weightChange")),
+        hr: numOrNull(fd.get("hr")),
+        rhythm: fd.get("rhythm"),
+        sbp: numOrNull(fd.get("sbp")),
+        dbp: numOrNull(fd.get("dbp")),
+        sbpStanding: numOrNull(fd.get("sbpStand")),
+        dbpStanding: numOrNull(fd.get("dbpStand")),
+        spo2: numOrNull(fd.get("spo2")),
+        o2: fd.get("o2").trim(),
+        rr: numOrNull(fd.get("rr")),
+        borgD: numOrNull(fd.get("borgD")),
+        borgRPE: numOrNull(fd.get("borgRPE")),
+        pef: numOrNull(fd.get("pef")),
+        pain: fd.get("pain").trim(),
+        symptoms: fd.get("symptoms").trim(),
+        meds: fd.get("meds").trim(),
+      };
+      s.step = "exercise";
+      render();
+    }});
+    form.appendChild(field("Weight (kg)", el("input", { name: "weight", type: "number", step: "0.1" })));
+    form.appendChild(field("Δ weight 3 d (kg)", el("input", { name: "weightChange", type: "number", step: "0.1", placeholder: "HF flag if ≥2" })));
+    form.appendChild(field("HR rest", el("input", { name: "hr", type: "number", min: 0, max: 250, required: true })));
+    form.appendChild(field("Rhythm", select("rhythm", [["sinus","Sinus"],["af","AF"],["paced","Paced"],["other","Other"]])));
+    form.appendChild(field("SBP supine", el("input", { name: "sbp", type: "number", min: 0, max: 300 })));
+    form.appendChild(field("DBP supine", el("input", { name: "dbp", type: "number", min: 0, max: 200 })));
+    form.appendChild(field("SBP standing", el("input", { name: "sbpStand", type: "number", min: 0, max: 300 })));
+    form.appendChild(field("DBP standing", el("input", { name: "dbpStand", type: "number", min: 0, max: 200 })));
+    form.appendChild(field("SpO2 (%)", el("input", { name: "spo2", type: "number", min: 0, max: 100, required: true })));
+    form.appendChild(field("O2 supplementation", el("input", { name: "o2", placeholder: "e.g. RA, 2L NC" })));
+    form.appendChild(field("Resp rate", el("input", { name: "rr", type: "number", min: 0, max: 60 })));
+    form.appendChild(field("Borg dyspnea (0-10)", el("input", { name: "borgD", type: "number", min: 0, max: 10, step: "0.5" })));
+    form.appendChild(field("Borg RPE (0-10)", el("input", { name: "borgRPE", type: "number", min: 0, max: 10, step: "0.5" })));
+    form.appendChild(field("PEF (asthma)", el("input", { name: "pef", type: "number" })));
+    form.appendChild(field("Pain (NRS, location)", el("input", { name: "pain" })));
+    form.appendChild(field("Symptoms checklist", el("input", { name: "symptoms", placeholder: "orthopnea, PND, edema, chest pain..." }), { full: true }));
+    form.appendChild(field("Medication changes since last session", el("input", { name: "meds" }), { full: true }));
+    form.appendChild(el("div", { class: "form-actions" },
+      el("button", { class: "btn btn-primary", type: "submit" }, "Continue to checklist →")
+    ));
+    div.appendChild(form);
+    return div;
+  }
+
+  function renderSessionChecklist(p, s, program) {
+    const div = el("div", { class: "subcard" });
+    div.appendChild(el("h3", {}, "Exercise checklist"));
+
+    // Stop criteria (always available, prominent)
+    div.appendChild(el("details", { class: "stop-criteria", open: true },
+      el("summary", {}, "Stop the session immediately if:"),
+      el("ul", {}, ...program.stopRules.map(r => el("li", {}, r)))
+    ));
+
+    const ul = el("ul", { class: "exercise-checklist" });
+    s.template.items.forEach((item, i) => {
+      const id = "item-" + i;
+      const checked = s.completed.includes(i);
+      const li = el("li", { class: "checklist-item" + (checked ? " done" : "") },
+        el("label", {},
+          el("input", {
+            type: "checkbox",
+            checked,
+            onchange: (e) => {
+              if (e.target.checked && !s.completed.includes(i)) s.completed.push(i);
+              else s.completed = s.completed.filter(x => x !== i);
+              render();
+            }
+          }),
+          el("span", { class: "checklist-text" }, item)
+        ),
+        el("input", {
+          class: "item-note",
+          placeholder: "note (optional)",
+          value: s.itemNotes[i] || "",
+          oninput: (e) => { s.itemNotes[i] = e.target.value; }
+        })
+      );
+      ul.appendChild(li);
+    });
+    div.appendChild(ul);
+
+    // Mid-session vitals quick log
+    div.appendChild(el("h3", {}, "Mid-session vitals (optional)"));
+    const midForm = el("div", { class: "form-grid" });
+    midForm.appendChild(field("HR", el("input", { id: "mid-hr", type: "number", min: 0, max: 250 })));
+    midForm.appendChild(field("SpO2", el("input", { id: "mid-spo2", type: "number", min: 0, max: 100 })));
+    midForm.appendChild(field("Borg", el("input", { id: "mid-borg", type: "number", min: 0, max: 10, step: "0.5" })));
+    midForm.appendChild(field("Note", el("input", { id: "mid-note" })));
+    midForm.appendChild(el("div", { class: "form-actions" },
+      el("button", { class: "btn btn-sm", onclick: () => {
+        const reading = {
+          atIso: new Date().toISOString(),
+          hr: numOrNull($("#mid-hr").value),
+          spo2: numOrNull($("#mid-spo2").value),
+          borg: numOrNull($("#mid-borg").value),
+          note: $("#mid-note").value,
+        };
+        if (reading.hr || reading.spo2 || reading.borg || reading.note) {
+          s.vitalsDuring.push(reading);
+        }
+        $("#mid-hr").value = ""; $("#mid-spo2").value = ""; $("#mid-borg").value = ""; $("#mid-note").value = "";
+        render();
+      } }, "Log reading")
+    ));
+    div.appendChild(midForm);
+
+    if (s.vitalsDuring.length) {
+      const t = el("table", { class: "mini-table" },
+        el("thead", {}, el("tr", {},
+          el("th", {}, "Time"), el("th", {}, "HR"), el("th", {}, "SpO2"), el("th", {}, "Borg"), el("th", {}, "Note")
+        )),
+        el("tbody", {}, ...s.vitalsDuring.map(r => el("tr", {},
+          el("td", {}, new Date(r.atIso).toLocaleTimeString()),
+          el("td", {}, r.hr ?? "—"), el("td", {}, r.spo2 ?? "—"), el("td", {}, r.borg ?? "—"), el("td", {}, r.note || "")
+        )))
+      );
+      div.appendChild(t);
+    }
+
+    div.appendChild(el("div", { class: "form-actions" },
+      el("button", { class: "btn btn-primary", onclick: () => { s.step = "post"; render(); } }, "Continue to post-session →"),
+      el("button", { class: "btn btn-ghost", onclick: () => { s.step = "pre"; render(); } }, "← Back to pre-session")
+    ));
+    return div;
+  }
+
+  function renderSessionPostForm(p, s) {
+    const div = el("div", { class: "subcard" }, el("h3", {}, "Post-session"));
+    const form = el("form", { class: "form-grid", onsubmit: (e) => {
+      e.preventDefault();
+      const fd = new FormData(form);
+      s.post = {
+        hr: numOrNull(fd.get("phr")),
+        sbp: numOrNull(fd.get("psbp")),
+        dbp: numOrNull(fd.get("pdbp")),
+        spo2: numOrNull(fd.get("pspo2")),
+        borgD: numOrNull(fd.get("pborgD")),
+        borgRPE: numOrNull(fd.get("pborgRPE")),
+        fatigue: numOrNull(fd.get("pfatigue")),
+        pef: numOrNull(fd.get("ppef")),
+      };
+      s.adverse = fd.get("adverse").trim();
+      s.notes = fd.get("notes").trim();
+      s.nextPlan = fd.get("nextPlan").trim();
+      s.createdAt = Date.now();
+
+      // Save and clear active
+      const tmpl = s.template;
+      const record = {
+        id: s.id, patientId: s.patientId, sessionN: s.sessionN, title: s.title, phase: s.phase,
+        borgTarget: s.borgTarget, date: s.date, createdAt: s.createdAt,
+        pre: s.pre, post: s.post,
+        completed: s.completed, itemNotes: s.itemNotes,
+        vitalsDuring: s.vitalsDuring, adverse: s.adverse, notes: s.notes, nextPlan: s.nextPlan,
+        templateItems: tmpl.items,
+      };
+      state.sessions.push(record);
+      persist();
+      state.activeSession = null;
+      render();
+    }});
+    form.appendChild(field("Post HR", el("input", { name: "phr", type: "number", min: 0, max: 250 })));
+    form.appendChild(field("Post SBP", el("input", { name: "psbp", type: "number", min: 0, max: 300 })));
+    form.appendChild(field("Post DBP", el("input", { name: "pdbp", type: "number", min: 0, max: 200 })));
+    form.appendChild(field("Post SpO2", el("input", { name: "pspo2", type: "number", min: 0, max: 100 })));
+    form.appendChild(field("Post Borg dyspnea", el("input", { name: "pborgD", type: "number", min: 0, max: 10, step: "0.5" })));
+    form.appendChild(field("Post Borg RPE", el("input", { name: "pborgRPE", type: "number", min: 0, max: 10, step: "0.5" })));
+    form.appendChild(field("Fatigue (0-10)", el("input", { name: "pfatigue", type: "number", min: 0, max: 10 })));
+    form.appendChild(field("Post PEF (asthma)", el("input", { name: "ppef", type: "number" })));
+    form.appendChild(field("Adverse events", el("input", { name: "adverse", placeholder: "none / desat / hypotension / sternal / fall / other" }), { full: true }));
+    form.appendChild(field("Notes", el("input", { name: "notes" }), { full: true }));
+    form.appendChild(field("Next-session plan", el("input", { name: "nextPlan", placeholder: "e.g. ↑ aerobic 3 min, +5% leg press load" }), { full: true }));
+    form.appendChild(el("div", { class: "form-actions" },
+      el("button", { class: "btn btn-primary", type: "submit" }, "Save session"),
+      el("button", { class: "btn btn-ghost", type: "button", onclick: () => { state.activeSession.step = "exercise"; render(); } }, "← Back to checklist")
+    ));
+    div.appendChild(form);
+    return div;
+  }
+
+  // ===== Reference view =====
+  function renderReference() {
+    const wrap = el("section", { class: "view ref" });
+
+    wrap.appendChild(refCard("6MWT — Verbatim ATS instructions",
+      [SCRIPT_6MWT.intro, "(Demonstrate one lap.)", SCRIPT_6MWT.ready].map(p => el("p", { class: "script" }, p))
+    ));
+
+    wrap.appendChild(refCard("6MWT — Minute-by-minute encouragement",
+      el("ul", {}, ...SCRIPT_6MWT.cues.map(c => el("li", {}, `@ ${Math.floor(c.atSec/60)}:${String(c.atSec%60).padStart(2,"0")} — "${c.text}"`)))
+    ));
+
+    wrap.appendChild(refCard("6MWT — Contraindications & stop criteria",
+      el("p", {}, el("b", {}, "Absolute: "), "MI or unstable angina within prior month."),
+      el("p", {}, el("b", {}, "Relative: "), "Resting HR >120, SBP >180, DBP >100."),
+      el("p", {}, el("b", {}, "Stop the test for: "), "Chest pain, intolerable dyspnea, leg cramps/claudication, staggering, diaphoresis with pallor/cyanosis, ashen appearance, confusion.")
+    ));
+
+    wrap.appendChild(refCard("6MWT — Reference equation (Enright & Sherrill 1998)",
+      el("p", {}, el("b", {}, "Men: "), "6MWD = (7.57 × ht) − (5.02 × age) − (1.76 × wt) − 309 m   [LLN −153 m]"),
+      el("p", {}, el("b", {}, "Women: "), "6MWD = (2.11 × ht) − (2.29 × wt) − (5.78 × age) + 667 m   [LLN −139 m]")
+    ));
+
+    wrap.appendChild(refCard("MCID by population",
+      el("ul", {},
+        el("li", {}, "COPD: 25–35 m"),
+        el("li", {}, "PAH: ~33 m"),
+        el("li", {}, "Heart failure: 30–50 m (pooled ~30)"),
+        el("li", {}, "IPF/ILD: 24–45 m"),
+        el("li", {}, "CABG / cardiac rehab: ~25–60 m (mean post-rehab gain ~60 m)")
+      )
+    ));
+
+    wrap.appendChild(refCard("Prescription from 6MWT",
+      el("ul", {},
+        el("li", {}, "Endurance training intensity: 70–80% of avg 6MWT speed"),
+        el("li", {}, "Avg speed = 6MWD ÷ 360 s"),
+        el("li", {}, "Borg dyspnea target: 4–6/10 (CR-10)"),
+        el("li", {}, "Re-test every 4–12 weeks; adjust to 80% of new 6MWD-derived speed"),
+        el("li", {}, "Use intervals if Borg ≥7 within 2 min at continuous prescription")
+      )
+    ));
+
+    wrap.appendChild(refCard("Borg CR-10 dyspnea / RPE scale",
+      el("table", { class: "mini-table" },
+        el("thead", {}, el("tr", {}, el("th", {}, "Score"), el("th", {}, "Description"))),
+        el("tbody", {},
+          ...[["0","Nothing at all"],["0.5","Very, very slight"],["1","Very slight"],["2","Slight"],["3","Moderate"],["4","Somewhat severe"],["5","Severe"],["7","Very severe"],["10","Maximal"]]
+            .map(r => el("tr", {}, el("td", {}, r[0]), el("td", {}, r[1])))
+        )
+      )
+    ));
+
+    wrap.appendChild(refCard("BODE index components (COPD)",
+      el("ul", {},
+        el("li", {}, "B — BMI (>21 = 0; ≤21 = 1)"),
+        el("li", {}, "O — Obstruction (FEV1 % predicted: ≥65=0, 50–64=1, 36–49=2, ≤35=3)"),
+        el("li", {}, "D — Dyspnea (mMRC 0–1=0, 2=1, 3=2, 4=3)"),
+        el("li", {}, "E — Exercise (6MWD ≥350=0, 250–349=1, 150–249=2, ≤149=3)"),
+        el("li", {}, "Total 0–10. 4-yr survival: BODE 0–2 ≈ 80%; 7–10 ≈ 18%.")
+      )
+    ));
+
+    wrap.appendChild(refCard("KYMITT (Keep Your Move in the Tube) — post-CABG",
+      el("ul", {},
+        el("li", {}, "Keep elbows close to torso (within an imaginary tube around the trunk)."),
+        el("li", {}, "Symmetric, low-load reaching is generally safe; avoid asymmetric loaded reaches."),
+        el("li", {}, "Guide load by pain / clicking, not arbitrary weight cutoffs."),
+        el("li", {}, "Avoid Valsalva (no breath-holding lifts). Splinted cough with a pillow."),
+        el("li", {}, "No driving 4 weeks; surgeon-cleared upper-body resistance from ~6 weeks.")
+      )
+    ));
+
+    wrap.appendChild(refCard("EIB-prevention warm-up (asthma)",
+      el("ul", {},
+        el("li", {}, "Pre-exercise SABA 15 min before, if prescribed."),
+        el("li", {}, "Option A: 6–8 × 30-sec near-maximal sprints with 1.5-min recoveries."),
+        el("li", {}, "Option B: 15 min continuous moderate warm-up at ~60% VO2max."),
+        el("li", {}, "Both induce a 1–2 hour refractory period."),
+        el("li", {}, "Avoid abrupt stopping (prolongs cooling/drying)."),
+        el("li", {}, "PEF post-exercise drop ≥10% = EIB.")
+      )
+    ));
+
+    wrap.appendChild(refCard("HF decompensation (always defer / refer)",
+      el("ul", {},
+        el("li", {}, "Weight gain >2 kg in 3 days (or >2.3 kg in a week)"),
+        el("li", {}, "New orthopnea, PND, or night cough"),
+        el("li", {}, "New peripheral edema or worsening of existing"),
+        el("li", {}, "Resting HR >100, SBP <90 with symptoms"),
+        el("li", {}, "New rapid AF >130 bpm, sustained VT, ICD shock")
+      )
+    ));
+
+    return wrap;
+  }
+
+  function refCard(title, ...children) {
+    return el("div", { class: "card ref-card" }, el("h2", {}, title), ...children);
+  }
+
+  // ---------------------- shared widgets ----------------------
+  function patientPicker() {
+    const wrap = el("div", { class: "card patient-picker" });
+    if (state.patients.length === 0) {
+      wrap.appendChild(el("div", { class: "empty" }, "No patients. Add one in the Patients tab."));
+      return wrap;
+    }
+    const sel = el("select", { onchange: (e) => { state.selectedPatientId = e.target.value || null; render(); } });
+    sel.appendChild(el("option", { value: "" }, "— select patient —"));
+    for (const p of [...state.patients].sort((a,b)=>a.name.localeCompare(b.name))) {
+      const opt = el("option", { value: p.id }, `${p.name} · ${PROGRAMS[p.condition]?.label || p.condition || "—"}`);
+      if (p.id === state.selectedPatientId) opt.selected = true;
+      sel.appendChild(opt);
+    }
+    wrap.appendChild(el("label", {}, "Patient: ", sel));
+    return wrap;
+  }
+
+  function field(label, input, opts = {}) {
+    return el("div", { class: "field" + (opts.full ? " full" : "") },
+      el("label", {}, label),
+      input
+    );
+  }
+
+  function select(name, options, required = false) {
+    const s = el("select", { name, required: required ? true : false });
+    for (const [v, l] of options) s.appendChild(el("option", { value: v }, l));
+    return s;
+  }
+
+  function numOrNull(v) {
+    if (v === "" || v == null) return null;
+    const n = Number(v);
+    return isNaN(n) ? null : n;
+  }
+
+  // ---------------------- export / import ----------------------
+  function exportData() {
+    const blob = new Blob([JSON.stringify({
+      version: 1,
+      exportedAt: new Date().toISOString(),
+      patients: state.patients,
+      tests: state.tests,
+      sessions: state.sessions,
+    }, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `cr-ex-export-${todayIso()}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function importData(file) {
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const data = JSON.parse(reader.result);
+        if (!data.patients) throw new Error("Invalid file");
+        if (!confirm(`Import ${data.patients.length} patients, ${data.tests?.length||0} tests, ${data.sessions?.length||0} sessions? This will REPLACE current data.`)) return;
+        state.patients = data.patients || [];
+        state.tests    = data.tests    || [];
+        state.sessions = data.sessions || [];
+        persist();
+        render();
+      } catch (e) {
+        alert("Import failed: " + e.message);
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  // ---------------------- bootstrap ----------------------
+  $(".tab").forEach(tab => {
+    tab.addEventListener("click", () => {
+      state.view = tab.dataset.view;
+      render();
+    });
+  });
+  $("#export-btn").addEventListener("click", exportData);
+  $("#import-btn").addEventListener("click", () => $("#import-file").click());
+  $("#import-file").addEventListener("change", (e) => {
+    if (e.target.files[0]) importData(e.target.files[0]);
+    e.target.value = "";
+  });
+
+  render();
+})();
+
+</script>
+</body>
+</html>
